@@ -1,0 +1,109 @@
+1003 我要通过！(20)（20 分）
+
+“答案正确”是自动判题系统给出的最令人欢喜的回复。本题属于PAT的“答案正确”大派送 —— 只要读入的字符串满足下列条件，系统就输出“答案正确”，否则输出“答案错误”。
+
+得到“答案正确”的条件是：
+
+1. 字符串中必须仅有P, A, T这三种字符，不可以包含其它字符；\
+
+    任意形如 xPATx 的字符串都可以获得“答案正确”，其中 x 或者是空字符串，或者是仅由字母 A 组成的字符串；\
+    如果 aPbTc 是正确的，那么 aPbATca 也是正确的，其中 a, b, c 均或者是空字符串，或者是仅由字母 A 组成的字符串。
+
+现在就请你为PAT写一个自动裁判程序，判定哪些字符串是可以获得“答案正确”的。
+
+输入格式： 每个测试输入包含1个测试用例。第1行给出一个自然数n (&lt10)，是需要检测的字符串个数。接下来每个字符串占一行，字符串长度不超过100，且不包含空格。
+
+输出格式：每个字符串的检测结果占一行，如果该字符串可以获得“答案正确”，则输出YES，否则输出NO。
+
+输入样例：
+
+8
+PAT
+PAAT
+AAPATAA
+AAPAATAAAA
+xPATx
+PT
+Whatever
+APAAATAA
+
+输出样例：
+
+YES
+YES
+YES
+YES
+NO
+NO
+NO
+NO
+
+
+My Code:
+#include<iostream>
+#include<string>
+#include<cstring>
+using namespace std;
+int main()
+{
+	int num;
+	cin>>num;
+	for(int ii=0;ii<num;ii++)
+	{
+		string str;
+		int right=1; 
+		int lcp=0,lct=0;
+		int pnum=0,tnum=0;
+		int i=0;
+		cin>>str;
+		while(i<str.length())
+		{
+			if(str[i]!='P'&&str[i]!='A'&&str[i]!='T') 
+			{
+				right=0;
+				break;
+			}
+			if(str[i]=='P')
+			{
+				lcp=i;
+				pnum++;	
+			} 
+			else if(str[i]=='T')
+			{
+				lct=i;
+				tnum++;
+			}
+			i++;
+		}
+		int front=lcp;//前面A的数量 
+		int center=lct-lcp-1;//中间A的数量 
+		int back=str.length()-lct-1;//后面A的数量 
+//		cout<<lcp<<" "<<lct<<endl;
+//		cout<<front<<" "<<center<<" "<<back<<endl; 
+		if(pnum!=1||tnum!=1) right = 0;
+		else if(center==1)
+		{
+			if(back!=front)right=0;
+		}
+		else if(center>1)
+		{
+			if(back!=center*front)//b的大小：center-1 back=b的大小*front+front=center*front 
+				right=0;
+		}
+		else right=0;
+		
+		if(right==1)cout<<"YES"<<endl;
+		else if(right==0)cout<<"NO"<<endl;
+	}
+	
+}
+BH题（BigHole）：
+1. 字符串中必须仅有P, A, T这三种字符，不可以包含其它字符；
+2.任意形如 xPATx 的字符串都可以获得“答案正确”，其中 x 或者是空字符串，或者是仅由字母 A 组成的字符串；\
+3.如果 aPbTc 是正确的，那么 aPbATca 也是正确的，其中 a, b, c 均或者是空字符串，或者是仅由字母 A 组成的字符串。
+思路分析：一条件没什么说的，二条件的意思是在PAT的前后要有相同的字符串x（可以是空字符串）
+但是这个三条件就比较坑了，他是建立在条件1,2上面的一个递推条件：如果字符串1通过了1,2两个条件，那么他就是正确的，而从第三个条件可以推出来一个字符串2也是正确的从而推出->字符串3······，一个递归式的推导过程。
+例：aPbTc -> aPbATca -> aPbbATcaa -> aPbbbATcaaa->······
+    AAPATAA -> AAPAATAAAA -> AAPAAATAAAAAA -> AAPAAAATAAAAAAAA```````
+（（front）P（center）T（back））：back=center*front
+
